@@ -10,6 +10,10 @@
 [Website][Rust] | [Getting started] | [Learn] | [Documentation] | [Contributing]
 </div>
 
+This is my 1L project, a RV64GC rust native backend for the rust compiler.
+At time of writing, im building directly off of a fork of the rust compiler, which is this repo, so theres a lot of existing Rustc code!
+Below is main Rustc repo.
+
 This is the main source code repository for [Rust]. It contains the compiler,
 standard library, and documentation.
 
