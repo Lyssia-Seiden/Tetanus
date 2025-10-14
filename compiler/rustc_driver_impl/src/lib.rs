@@ -295,13 +295,18 @@ pub fn run_compiler(at_args: &[String], callbacks: &mut (dyn Callbacks + Send)) 
         }
 
         if print_crate_info(codegen_backend, sess, has_input) == Compilation::Stop {
+            safe_println!("early exit from crate info");
             return early_exit();
         }
+
+        safe_println!("has input check");
 
         if !has_input {
             #[allow(rustc::diagnostic_outside_of_impl)]
             sess.dcx().fatal("no input filename given"); // this is fatal
         }
+
+        safe_println!("unstable ops check");
 
         if !sess.opts.unstable_opts.ls.is_empty() {
             list_metadata(sess, &*codegen_backend.metadata_loader());
@@ -312,6 +317,8 @@ pub fn run_compiler(at_args: &[String], callbacks: &mut (dyn Callbacks + Send)) 
             process_rlink(sess, compiler);
             return early_exit();
         }
+
+        safe_println!("parsing crate root");
 
         // Parse the crate root source code (doesn't parse submodules yet)
         // Everything else is parsed during macro expansion.
@@ -654,6 +661,7 @@ fn print_crate_info(
         macro println_info($($arg:tt)*) {
             crate_info.write_fmt(format_args!("{}\n", format_args!($($arg)*))).unwrap()
         }
+        println_info!("req: {:?}", req);
 
         match req.kind {
             TargetList => {

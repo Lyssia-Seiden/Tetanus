@@ -130,6 +130,7 @@ pub enum CodegenBackendKind {
     Llvm,
     Cranelift,
     Gcc,
+    Tetanus,
     Custom(String),
 }
 
@@ -141,6 +142,7 @@ impl CodegenBackendKind {
             CodegenBackendKind::Llvm => "llvm",
             CodegenBackendKind::Cranelift => "cranelift",
             CodegenBackendKind::Gcc => "gcc",
+            CodegenBackendKind::Tetanus => "tetanus",
             CodegenBackendKind::Custom(name) => name,
         }
     }
@@ -160,6 +162,25 @@ impl CodegenBackendKind {
 
     pub fn is_gcc(&self) -> bool {
         matches!(self, Self::Gcc)
+    }
+
+    pub fn is_tetanus(&self) -> bool {
+        matches!(self, Self::Tetanus)
+    }
+}
+
+impl std::str::FromStr for CodegenBackendKind {
+    type Err = &'static str;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.to_lowercase().as_str() {
+            "" => Err("Invalid empty backend name"),
+            "gcc" => Ok(Self::Gcc),
+            "llvm" => Ok(Self::Llvm),
+            "cranelift" => Ok(Self::Cranelift),
+            "tetanus" => Ok(Self::Tetanus),
+            _ => Ok(Self::Custom(s.to_string())),
+        }
     }
 }
 

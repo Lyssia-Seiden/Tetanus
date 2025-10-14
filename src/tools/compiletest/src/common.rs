@@ -180,6 +180,7 @@ pub enum CodegenBackend {
     Cranelift,
     Gcc,
     Llvm,
+    Tetanus,
 }
 
 impl<'a> TryFrom<&'a str> for CodegenBackend {
@@ -190,6 +191,7 @@ impl<'a> TryFrom<&'a str> for CodegenBackend {
             "cranelift" => Ok(Self::Cranelift),
             "gcc" => Ok(Self::Gcc),
             "llvm" => Ok(Self::Llvm),
+            "tetanus" => Ok(Self::Tetanus),
             _ => Err("unknown backend"),
         }
     }
@@ -201,6 +203,7 @@ impl CodegenBackend {
             Self::Cranelift => "cranelift",
             Self::Gcc => "gcc",
             Self::Llvm => "llvm",
+            Self::Tetanus => "tetanus",
         }
     }
 }
