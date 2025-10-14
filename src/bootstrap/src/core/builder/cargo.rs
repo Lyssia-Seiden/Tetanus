@@ -728,6 +728,7 @@ impl Builder<'_> {
                 // Build proc macros both for the host and the target unless proc-macros are not
                 // supported by the target.
                 if target != compiler.host && cmd_kind != Kind::Check {
+                    eprintln!("running w --print=file-names");
                     let error = self
                         .rustc_cmd(compiler)
                         .arg("--target")

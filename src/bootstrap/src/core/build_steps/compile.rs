@@ -1711,6 +1711,80 @@ impl Step for CraneliftCodegenBackend {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct TetanusCodegenBackend {
+    pub compilers: RustcPrivateCompilers,
+}
+
+impl Step for TetanusCodegenBackend {
+    type Output = BuildStamp;
+    const IS_HOST: bool = true;
+
+    fn should_run(run: ShouldRun<'_>) -> ShouldRun<'_> {
+        run.alias("rustc_codegen_tetanus").alias("cg_tetanus")
+    }
+
+    fn make_run(run: RunConfig<'_>) {
+        run.builder.ensure(TetanusCodegenBackend {
+            compilers: RustcPrivateCompilers::new(run.builder, run.builder.top_stage, run.target),
+        });
+    }
+
+    fn run(self, builder: &Builder<'_>) -> Self::Output {
+        let target = self.compilers.target();
+        let build_compiler = self.compilers.build_compiler();
+
+        let stamp = build_stamp::codegen_backend_stamp(
+            builder,
+            build_compiler,
+            target,
+            &CodegenBackendKind::Tetanus,
+        );
+
+        if builder.config.keep_stage.contains(&build_compiler.stage) {
+            trace!("`keep-stage` requested");
+            builder.info(
+                "WARNING: Using a potentially old codegen backend. \
+                This may not behave well.",
+            );
+            // Codegen backends are linked separately from this step today, so we don't do
+            // anything here.
+            return stamp;
+        }
+
+        let mut cargo = builder::Cargo::new(
+            builder,
+            build_compiler,
+            Mode::Codegen,
+            SourceType::InTree,
+            target,
+            Kind::Build,
+        );
+        cargo
+            .arg("--manifest-path")
+            .arg(builder.src.join("compiler/rustc_codegen_tetanus/Cargo.toml"))
+            .arg("-v");
+        rustc_cargo_env(builder, &mut cargo, target);
+
+        let _guard = builder.msg(
+            Kind::Build,
+            "codegen backend tetanus",
+            Mode::Codegen,
+            build_compiler,
+            target,
+        );
+        let files = run_cargo(builder, cargo, vec![], &stamp, vec![], false, false);
+        write_codegen_backend_stamp(stamp, files, builder.config.dry_run())
+    }
+
+    fn metadata(&self) -> Option<StepMetadata> {
+        Some(
+            StepMetadata::build("rustc_codegen_tetanus", self.compilers.target())
+                .built_by(self.compilers.build_compiler()),
+        )
+    }
+}
+
 /// Write filtered `files` into the passed build stamp and returns it.
 fn write_codegen_backend_stamp(
     mut stamp: BuildStamp,
@@ -2309,6 +2383,11 @@ impl Step for Assemble {
                         // Also copy libgccjit to the library sysroot, so that it is available for
                         // the codegen backend.
                         output.gcc.install_to(builder, &rustc_libdir);
+                    }
+                    CodegenBackendKind::Tetanus => {
+                        let stamp = builder
+                            .ensure(TetanusCodegenBackend { compilers: prepare_compilers() });
+                        copy_codegen_backends_to_sysroot(builder, stamp, target_compiler);
                     }
                     CodegenBackendKind::Llvm | CodegenBackendKind::Custom(_) => continue,
                 }
