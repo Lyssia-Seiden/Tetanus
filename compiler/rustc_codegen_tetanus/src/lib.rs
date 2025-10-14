@@ -44,9 +44,7 @@ impl CodegenBackend for TetanusCodegenBackend {
         "tetanus"
     }
 
-    fn init(&self, _sess: &Session) {
-        println!("init!! :D");
-    }
+    fn init(&self, _sess: &Session) {}
 
     fn print(&self, req: &PrintRequest, out: &mut String, _sess: &Session) {
         writeln!(out, "havent done print() yet").unwrap();
