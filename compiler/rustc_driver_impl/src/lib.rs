@@ -295,7 +295,6 @@ pub fn run_compiler(at_args: &[String], callbacks: &mut (dyn Callbacks + Send)) 
         }
 
         if print_crate_info(codegen_backend, sess, has_input) == Compilation::Stop {
-            safe_println!("early exit from crate info");
             return early_exit();
         }
 
@@ -661,7 +660,6 @@ fn print_crate_info(
         macro println_info($($arg:tt)*) {
             crate_info.write_fmt(format_args!("{}\n", format_args!($($arg)*))).unwrap()
         }
-        println_info!("req: {:?}", req);
 
         match req.kind {
             TargetList => {
