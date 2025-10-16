@@ -12,6 +12,7 @@ use std::any::Any;
 use std::path::PathBuf;
 use std::string::String;
 use std::fmt::Write;
+use tracing::info;
 
 use rustc_codegen_ssa::traits::*;
 use rustc_codegen_ssa::ModuleCodegen;
@@ -64,20 +65,26 @@ impl CodegenBackend for TetanusCodegenBackend {
 
     fn join_codegen(
         &self,
-        _ongoing_codegen: Box<dyn Any>,
-        _sess: &Session,
+        ongoing_codegen: Box<dyn Any>,
+        sess: &Session,
         _outputs: &OutputFilenames,
     ) -> (CodegenResults, FxIndexMap<WorkProductId, WorkProduct>) {
-        panic!("codegen not implemented");
+        let (codegen_results, work_products) = ongoing_codegen
+            .downcast::<rustc_codegen_ssa::back::write::OngoingCodegen<TetanusCodegenBackend>>()
+            .expect("Expected Tetanus's OngoingCodegen, found Box<Any>")
+            .join(sess);
+        (codegen_results, work_products)
     }
 
     
-    fn codegen_crate<'tcx>(&self, tcx: TyCtxt<'tcx>) -> Box<dyn Any> {
-        Box::new(rustc_codegen_ssa::base::codegen_crate(
-            TetanusCodegenBackend(),
-            tcx,
-            "hiii :3".to_string(),
-        ))
+    fn codegen_crate<'tcx>(&self, _tcx: TyCtxt<'tcx>) -> Box<dyn Any> {
+        info!("hi from tetanus :3");
+        // Box::new(rustc_codegen_ssa::base::codegen_crate(
+        //     TetanusCodegenBackend(),
+        //     tcx,
+        //     "hiii :3".to_string(),
+        // ))
+        Box::new(())
     }
 }
 
@@ -119,8 +126,8 @@ impl ExtraBackendMethods for TetanusCodegenBackend {
 impl WriteBackendMethods for TetanusCodegenBackend {
     type Module = ModuleTetanus;
     type ModuleBuffer = back::lto::ModuleBuffer;
-    type TargetMachine = String;
-    type TargetMachineError = Box<dyn Any>;
+    type TargetMachine = ();
+    type TargetMachineError = ();
     type ThinData = back::lto::ThinData;
     type ThinBuffer = back::lto::ThinBuffer;
     /// Performs fat LTO by merging all modules into a single one, running autodiff
