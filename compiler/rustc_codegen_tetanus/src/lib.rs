@@ -12,8 +12,9 @@ use std::any::Any;
 use std::path::PathBuf;
 use std::string::String;
 use std::fmt::Write;
-use tracing::info;
 
+#[allow(unused_imports)]
+use rustc_hir::def_id::LOCAL_CRATE;
 use rustc_codegen_ssa::traits::*;
 use rustc_codegen_ssa::ModuleCodegen;
 use rustc_middle::ty::TyCtxt;
@@ -34,7 +35,7 @@ mod back;
 rustc_fluent_macro::fluent_messages! { "../messages.ftl" }
 
 #[derive(Clone)]
-pub struct TetanusCodegenBackend();
+pub struct TetanusCodegenBackend(());
 
 impl CodegenBackend for TetanusCodegenBackend {
     fn locale_resource(&self) -> &'static str {
@@ -77,14 +78,17 @@ impl CodegenBackend for TetanusCodegenBackend {
     }
 
     
-    fn codegen_crate<'tcx>(&self, _tcx: TyCtxt<'tcx>) -> Box<dyn Any> {
-        info!("hi from tetanus :3");
-        // Box::new(rustc_codegen_ssa::base::codegen_crate(
-        //     TetanusCodegenBackend(),
-        //     tcx,
-        //     "hiii :3".to_string(),
-        // ))
-        Box::new(())
+    fn codegen_crate<'tcx>(&self, tcx: TyCtxt<'tcx>) -> Box<dyn Any> {
+        // info!("hi from tetanus :3");
+        // eprintln!("LOCAL_CRATE: {}", crate::LOCAL_CRATE.as_u32());
+        // eprintln!("tcx {:?}", tcx);
+        // eprintln!("LOCAL_CRATE name {}", tcx.crate_name(LOCAL_CRATE));
+        Box::new(rustc_codegen_ssa::base::codegen_crate(
+            TetanusCodegenBackend(()),
+            tcx,
+            "riscv".to_string(),
+        ))
+        // Box::new(())
     }
 }
 
@@ -173,11 +177,11 @@ impl WriteBackendMethods for TetanusCodegenBackend {
         panic!("not implemented yet!");
     }
     fn codegen(
-        _cgcx: &CodegenContext<Self>,
-        _module: ModuleCodegen<Self::Module>,
-        _config: &ModuleConfig,
+        cgcx: &CodegenContext<Self>,
+        module: ModuleCodegen<Self::Module>,
+        config: &ModuleConfig,
     ) -> CompiledModule {
-        panic!("not implemented yet!");
+        back::write::codegen(cgcx, module, config)
     }
     fn prepare_thin(_module: ModuleCodegen<Self::Module>) -> (String, Self::ThinBuffer) {
         panic!("not implemented yet!");
@@ -189,8 +193,8 @@ impl WriteBackendMethods for TetanusCodegenBackend {
 
 pub struct ModuleTetanus {}
 
-/// This is the entrypoint for a hot plugged rustc_codegen_cranelift
+/// This is the entrypoint for a hot plugged rustc_codegen_tetanus
 #[unsafe(no_mangle)]
 pub fn __rustc_codegen_backend() -> Box<dyn CodegenBackend> {
-    Box::new(TetanusCodegenBackend {})
+    Box::new(TetanusCodegenBackend(()))
 }
