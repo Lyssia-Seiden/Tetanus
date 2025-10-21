@@ -1227,7 +1227,6 @@ pub(crate) fn start_codegen<'tcx>(
     let codegen = tcx.sess.time("codegen_crate", move || codegen_backend.codegen_crate(tcx));
 
     info!("Post-codegen\n{:?}", tcx.debug_stats());
-    eprintln!("post codegen");
 
     // This must run after monomorphization so that all generic types
     // have been instantiated.

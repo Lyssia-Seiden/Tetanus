@@ -13,8 +13,8 @@
 
 #[allow(unused_extern_crates)]
 extern crate rustc_driver;
-#[macro_use]
-extern crate tracing;
+// #[macro_use]
+// extern crate tracing;
 extern crate rustc_codegen_ssa;
 extern crate rustc_data_structures;
 extern crate rustc_errors;
@@ -94,19 +94,11 @@ impl CodegenBackend for TetanusCodegenBackend {
 
     
     fn codegen_crate<'tcx>(&self, tcx: TyCtxt<'tcx>) -> Box<dyn Any> {
-        info!("hi from tetanus :3");
-        eprintln!("LOCAL_CRATE: {}", crate::LOCAL_CRATE.as_u32());
-        eprintln!("tcx crates {:?}", tcx.crates(()));
-        eprintln!("tcx u32 {:?}", tcx.crate_name(LOCAL_CRATE).as_u32());
-        eprintln!("tcx empty {:?}", tcx.crate_name(LOCAL_CRATE).is_empty());
-        eprintln!("local crate name {}", tcx.crate_name(LOCAL_CRATE));
-        // eprintln!("LOCAL_CRATE kind {:?}", tcx.dep_kind(LOCAL_CRATE));
         Box::new(rustc_codegen_ssa::base::codegen_crate(
             TetanusCodegenBackend(()),
             tcx,
             "riscv".to_string(),
         ))
-        // Box::new(())
     }
 }
 
