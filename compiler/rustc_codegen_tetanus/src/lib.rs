@@ -118,7 +118,7 @@ impl ExtraBackendMethods for TetanusCodegenBackend {
         _kind: AllocatorKind,
         _alloc_error_handler_kind: AllocatorKind,
     ) -> Self::Module {
-        panic!("not implemented yet!");
+        Self::Module{}
     }
 
     /// This generates the codegen unit and returns it along with
