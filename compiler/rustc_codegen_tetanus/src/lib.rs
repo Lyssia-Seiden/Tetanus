@@ -136,7 +136,8 @@ impl ExtraBackendMethods for TetanusCodegenBackend {
         _opt_level: OptLevel,
         _target_features: &[String],
     ) -> TargetMachineFactoryFn<Self> {
-        panic!("not implemented yet!");
+        
+        Arc::new(|_| Ok(()))
     }
 
     // fn supports_parallel(&self) -> bool {
