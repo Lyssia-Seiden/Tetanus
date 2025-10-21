@@ -29,6 +29,10 @@ impl ThinBufferMethods for ThinBuffer {
     fn data(&self) -> &[u8] {
         &[]
     }
+
+    fn thin_link_data(&self) -> &[u8] {
+        &[]
+    }
 }
 
 pub struct ThinData();

@@ -993,6 +993,8 @@ pub fn create_and_enter_global_ctxt<T, F: for<'tcx> FnOnce(TyCtxt<'tcx>) -> T>(
                 let feed = tcx.create_crate_num(stable_crate_id).unwrap();
                 assert_eq!(feed.key(), LOCAL_CRATE);
                 feed.crate_name(crate_name);
+                eprintln!("set local crate name!");
+                eprintln!("local name is {}", tcx.crate_name(LOCAL_CRATE));
 
                 let feed = tcx.feed_unit_query();
                 feed.features_query(tcx.arena.alloc(rustc_expand::config::features(
@@ -1225,6 +1227,7 @@ pub(crate) fn start_codegen<'tcx>(
     let codegen = tcx.sess.time("codegen_crate", move || codegen_backend.codegen_crate(tcx));
 
     info!("Post-codegen\n{:?}", tcx.debug_stats());
+    eprintln!("post codegen");
 
     // This must run after monomorphization so that all generic types
     // have been instantiated.

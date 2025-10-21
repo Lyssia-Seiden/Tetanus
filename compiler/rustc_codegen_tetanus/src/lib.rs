@@ -12,6 +12,8 @@ use std::any::Any;
 use std::path::PathBuf;
 use std::string::String;
 use std::fmt::Write;
+#[macro_use]
+extern crate tracing;
 
 #[allow(unused_imports)]
 use rustc_hir::def_id::LOCAL_CRATE;
@@ -25,7 +27,8 @@ use rustc_session::config::{OutputFilenames, PrintRequest, OptLevel};
 use rustc_codegen_ssa::back::write::{TargetMachineFactoryFn, CodegenContext, ModuleConfig, FatLtoInput};
 use rustc_codegen_ssa::back::lto::{SerializedModule, ThinModule};
 use rustc_codegen_ssa::{CodegenResults, TargetConfig};
-use rustc_errors::DiagCtxtHandle;
+use rustc_errors::{DiagCtxtHandle, FatalError};
+use rustc_ast::expand::autodiff_attrs::AutoDiffItem;
 use rustc_data_structures::fx::FxIndexMap;
 use rustc_span::Symbol;
 use rustc_codegen_ssa::CompiledModule;
@@ -40,10 +43,6 @@ pub struct TetanusCodegenBackend(());
 impl CodegenBackend for TetanusCodegenBackend {
     fn locale_resource(&self) -> &'static str {
         crate::DEFAULT_LOCALE_RESOURCE
-    }
-
-    fn name(&self) -> &'static str {
-        "tetanus"
     }
 
     fn init(&self, _sess: &Session) {}
@@ -79,10 +78,13 @@ impl CodegenBackend for TetanusCodegenBackend {
 
     
     fn codegen_crate<'tcx>(&self, tcx: TyCtxt<'tcx>) -> Box<dyn Any> {
-        // info!("hi from tetanus :3");
-        // eprintln!("LOCAL_CRATE: {}", crate::LOCAL_CRATE.as_u32());
-        // eprintln!("tcx {:?}", tcx);
-        // eprintln!("LOCAL_CRATE name {}", tcx.crate_name(LOCAL_CRATE));
+        info!("hi from tetanus :3");
+        eprintln!("LOCAL_CRATE: {}", crate::LOCAL_CRATE.as_u32());
+        eprintln!("tcx crates {:?}", tcx.crates(()));
+        eprintln!("tcx u32 {:?}", tcx.crate_name(LOCAL_CRATE).as_u32());
+        eprintln!("tcx empty {:?}", tcx.crate_name(LOCAL_CRATE).is_empty());
+        eprintln!("local crate name {}", tcx.crate_name(LOCAL_CRATE));
+        // eprintln!("LOCAL_CRATE kind {:?}", tcx.dep_kind(LOCAL_CRATE));
         Box::new(rustc_codegen_ssa::base::codegen_crate(
             TetanusCodegenBackend(()),
             tcx,
@@ -122,9 +124,9 @@ impl ExtraBackendMethods for TetanusCodegenBackend {
         panic!("not implemented yet!");
     }
 
-    fn supports_parallel(&self) -> bool {
-        false
-    }
+    // fn supports_parallel(&self) -> bool {
+    //     false
+    // }
 }
 
 impl WriteBackendMethods for TetanusCodegenBackend {
@@ -134,6 +136,7 @@ impl WriteBackendMethods for TetanusCodegenBackend {
     type TargetMachineError = ();
     type ThinData = back::lto::ThinData;
     type ThinBuffer = back::lto::ThinBuffer;
+    
     /// Performs fat LTO by merging all modules into a single one, running autodiff
     /// if necessary and running any further optimizations
     fn run_and_optimize_fat_lto(
@@ -141,9 +144,11 @@ impl WriteBackendMethods for TetanusCodegenBackend {
         _exported_symbols_for_lto: &[String],
         _each_linked_rlib_for_lto: &[PathBuf],
         _modules: Vec<FatLtoInput<Self>>,
-    ) -> ModuleCodegen<Self::Module> {
+        _diff_fncs: Vec<AutoDiffItem>,
+    ) -> Result<ModuleCodegen<Self::Module>, FatalError> {
         panic!("not implemented yet!");
     }
+
     /// Performs thin LTO by performing necessary global analysis and returning two
     /// lists, one of the modules that need optimization and another for modules that
     /// can simply be copied over from the incr. comp. cache.
@@ -153,7 +158,7 @@ impl WriteBackendMethods for TetanusCodegenBackend {
         _each_linked_rlib_for_lto: &[PathBuf],
         _modules: Vec<(String, Self::ThinBuffer)>,
         _cached_modules: Vec<(SerializedModule<Self::ModuleBuffer>, WorkProduct)>,
-    ) -> (Vec<ThinModule<Self>>, Vec<WorkProduct>) {
+    ) -> Result<(Vec<ThinModule<Self>>, Vec<WorkProduct>), FatalError> {
         panic!("not implemented yet!");
     }
     fn print_pass_timings(&self) {
@@ -167,23 +172,23 @@ impl WriteBackendMethods for TetanusCodegenBackend {
         _dcx: DiagCtxtHandle<'_>,
         _module: &mut ModuleCodegen<Self::Module>,
         _config: &ModuleConfig,
-    ) {
+    ) -> Result<(), FatalError> {
         panic!("not implemented yet!");
     }
     fn optimize_thin(
         _cgcx: &CodegenContext<Self>,
         _thin: ThinModule<Self>,
-    ) -> ModuleCodegen<Self::Module> {
+    ) -> Result<ModuleCodegen<Self::Module>, FatalError> {
         panic!("not implemented yet!");
     }
     fn codegen(
         cgcx: &CodegenContext<Self>,
         module: ModuleCodegen<Self::Module>,
         config: &ModuleConfig,
-    ) -> CompiledModule {
-        back::write::codegen(cgcx, module, config)
+    ) -> Result<CompiledModule, FatalError> {
+        Ok(back::write::codegen(cgcx, module, config))
     }
-    fn prepare_thin(_module: ModuleCodegen<Self::Module>) -> (String, Self::ThinBuffer) {
+    fn prepare_thin(_module: ModuleCodegen<Self::Module>, _want_summary: bool) -> (String, Self::ThinBuffer) {
         panic!("not implemented yet!");
     }
     fn serialize_module(_module: ModuleCodegen<Self::Module>) -> (String, Self::ModuleBuffer) {
