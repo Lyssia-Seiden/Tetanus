@@ -29,6 +29,7 @@ use std::any::Any;
 use std::path::PathBuf;
 use std::string::String;
 use std::fmt::Write;
+use std::sync::Arc;
 
 #[allow(unused_imports)]
 use rustc_hir::def_id::LOCAL_CRATE;
@@ -125,9 +126,12 @@ impl ExtraBackendMethods for TetanusCodegenBackend {
     fn compile_codegen_unit(
         &self,
         _tcx: TyCtxt<'_>,
-        _cgu_name: Symbol,
+        cgu_name: Symbol,
     ) -> (ModuleCodegen<Self::Module>, u64) {
-        panic!("not implemented yet!");
+        (
+            ModuleCodegen::<Self::Module>::new_regular(cgu_name.to_string(), Self::Module{}),
+            64
+        )
     }
 
     fn target_machine_factory(
@@ -136,7 +140,6 @@ impl ExtraBackendMethods for TetanusCodegenBackend {
         _opt_level: OptLevel,
         _target_features: &[String],
     ) -> TargetMachineFactoryFn<Self> {
-        
         Arc::new(|_| Ok(()))
     }
 
@@ -189,7 +192,7 @@ impl WriteBackendMethods for TetanusCodegenBackend {
         _module: &mut ModuleCodegen<Self::Module>,
         _config: &ModuleConfig,
     ) -> Result<(), FatalError> {
-        panic!("not implemented yet!");
+        Ok(())
     }
     fn optimize_thin(
         _cgcx: &CodegenContext<Self>,
