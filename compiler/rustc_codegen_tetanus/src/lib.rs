@@ -8,12 +8,27 @@
 
 // tidy-alphabetical-end
 
+// #![deny(warnings)]
+#![feature(rustc_private)]
+
+#[allow(unused_extern_crates)]
+extern crate rustc_driver;
+#[macro_use]
+extern crate tracing;
+extern crate rustc_codegen_ssa;
+extern crate rustc_data_structures;
+extern crate rustc_errors;
+extern crate rustc_hir;
+extern crate rustc_ast;
+extern crate rustc_middle;
+extern crate rustc_session;
+extern crate rustc_span;
+extern crate rustc_fluent_macro;
+
 use std::any::Any;
 use std::path::PathBuf;
 use std::string::String;
 use std::fmt::Write;
-#[macro_use]
-extern crate tracing;
 
 #[allow(unused_imports)]
 use rustc_hir::def_id::LOCAL_CRATE;
