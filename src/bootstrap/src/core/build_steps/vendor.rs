@@ -23,6 +23,7 @@ pub fn default_paths_to_vendor(builder: &Builder<'_>) -> Vec<(PathBuf, Vec<&'sta
         ("src/tools/rust-analyzer/Cargo.toml", vec![]),
         ("compiler/rustc_codegen_cranelift/Cargo.toml", vec![]),
         ("compiler/rustc_codegen_gcc/Cargo.toml", vec![]),
+        ("compiler/rustc_codegen_tetanus/Cargo.toml", vec![]),
         ("library/Cargo.toml", vec![]),
         ("src/bootstrap/Cargo.toml", vec![]),
         ("src/tools/rustbook/Cargo.toml", SUBMODULES_FOR_RUSTBOOK.into()),

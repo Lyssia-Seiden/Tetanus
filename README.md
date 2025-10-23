@@ -1,3 +1,41 @@
+# Tetanus
+
+This is my 1L project, a RV64GC rust native backend for the rust compiler.
+At time of writing, im building directly off of a fork of the rust compiler, which is this repo, so theres a lot of existing Rustc code!
+Below is main Rustc repo.
+
+## Why?
+
+Rust compile times are slow.
+This is one of the fundamental tradeoffs for the language; slow compile times in exchange for catching more issues at compile time.
+However, for debug builds developer velocity is more important than fancy machine code optimizations.
+
+#### a simplified overview of the rust compiler pipeline
+
+```mermaid
+flowchart TB
+subgraph frontend
+sc["source code"]-->AST
+AST-->irs["Various Intermediate Representations (IRs)"]
+irs-->MIR["Mid-level IR"]
+end
+subgraph backend
+MIR-->llvm["LLVM IR"]
+llvm-->mc["machine code"]
+end
+```
+
+The Rust compiler typically spends about 2/3 of its time in the "frontend" and 1/3 in the "backend".
+While the frontend has to contend with lots of complicated type algebra, the backend is operating on (relatively) simple IRs, and has room for simplification.
+This is the goal of Tetanus:
+A simple, unoptimal backend for fast iteration.
+For now, Tetanus will only target the RISC-V ISA.
+This is an open upcoming ISA that is gaining traction in the embedded space.
+Embedded developers are often mindful about what machine code will be generated from their high level code, so a backend that does less for them is likely more acceptable in this problem space.
+
+Tetanus will be distributed as an alternative backend for the normal rust toolchain and will be rustc and cargo compatible.
+The usage process will be similar to existing cranelift and gcc backends.
+
 <div align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/rust-lang/www.rust-lang.org/master/static/images/rust-social-wide-dark.svg">
@@ -9,6 +47,8 @@
 
 [Website][Rust] | [Getting started] | [Learn] | [Documentation] | [Contributing]
 </div>
+
+# Original README
 
 This is the main source code repository for [Rust]. It contains the compiler,
 standard library, and documentation.

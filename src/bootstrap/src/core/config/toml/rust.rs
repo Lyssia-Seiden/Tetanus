@@ -416,6 +416,7 @@ pub(crate) fn parse_codegen_backends(
             "llvm" => CodegenBackendKind::Llvm,
             "cranelift" => CodegenBackendKind::Cranelift,
             "gcc" => CodegenBackendKind::Gcc,
+            "tetanus" => CodegenBackendKind::Tetanus,
             backend => CodegenBackendKind::Custom(backend.to_string()),
         };
         found_backends.push(backend);
