@@ -6,11 +6,7 @@ pub struct ModuleBuffer();
 unsafe impl Send for ModuleBuffer {}
 unsafe impl Sync for ModuleBuffer {}
 
-impl ModuleBuffer {
-    // pub(crate) fn new() -> ModuleBuffer {
-    //     Self{}
-    // }
-}
+impl ModuleBuffer {}
 
 impl ModuleBufferMethods for ModuleBuffer {
     fn data(&self) -> &[u8] {

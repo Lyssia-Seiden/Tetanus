@@ -5,7 +5,6 @@ use rustc_codegen_ssa::CrateInfo;
 use rustc_codegen_ssa::CodegenResults;
 use rustc_data_structures::fx::FxIndexMap;
 use rustc_session::Session;
-// use rustc_session::config::OutputFilenames;
 
 #[allow(dead_code)]
 pub(crate) struct ModuleCodegenResult {
@@ -19,12 +18,6 @@ pub(crate) enum OngoingModuleCodegen {
     Sync(Result<ModuleCodegenResult, String>),
     // Async(JoinHandle<Result<ModuleCodegenResult, String>>),
 }
-
-// impl<HCX> HashStable<HCX> for OngoingModuleCodegen {
-//     fn hash_stable(&self, _: &mut HCX, _: &mut StableHasher) {
-//         // do nothing
-//     }
-// }
 
 #[allow(dead_code)]
 pub(crate) struct OngoingCodegen {

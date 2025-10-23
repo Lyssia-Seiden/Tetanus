@@ -215,7 +215,6 @@ impl CStore {
         tcx: TyCtxt<'tcx>,
         root: &CrateRoot,
     ) -> Result<TyCtxtFeed<'tcx, CrateNum>, CrateError> {
-        eprintln!("interning crate id");
         assert_eq!(self.metas.len(), tcx.untracked().stable_crate_ids.read().len());
         let num = tcx.create_crate_num(root.stable_crate_id()).map_err(|existing| {
             // Check for (potential) conflicts with the local crate
