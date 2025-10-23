@@ -10,10 +10,9 @@ Rust compile times are slow.
 This is one of the fundamental tradeoffs for the language; slow compile times in exchange for catching more issues at compile time.
 However, for debug builds developer velocity is more important than fancy machine code optimizations.
 
+#### a simplified overview of the rust compiler pipeline
+
 ```mermaid
----
-title: "A simplified view of the compiler pipeline"
----
 flowchart TB
 subgraph frontend
 sc["source code"]-->AST
