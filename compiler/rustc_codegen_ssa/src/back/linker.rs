@@ -785,6 +785,11 @@ impl<'a> Linker for GccLinker<'a> {
             }
         }
 
+        if self.target_cpu == "riscv" {
+            // TODO fix tetanus
+            return;
+        }
+
         // We manually create a list of exported symbols to ensure we don't expose any more.
         // The object files have far more public symbols than we actually want to export,
         // so we hide them all here.

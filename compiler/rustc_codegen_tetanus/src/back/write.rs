@@ -20,7 +20,7 @@ pub fn codegen(
         &module.name,
         cgcx.invocation_temp.as_deref(),
     );
-    eprintln!("writing to {:?}", path);
+    
     let elf = ElfBuilder::new_with_header();
     let mut file = File::create(path).unwrap();
     file.write_all(&elf.bytes).unwrap();
