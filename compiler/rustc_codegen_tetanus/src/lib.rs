@@ -61,7 +61,11 @@ impl CodegenBackend for TetanusCodegenBackend {
         crate::DEFAULT_LOCALE_RESOURCE
     }
 
-    fn init(&self, _sess: &Session) {}
+    fn init(&self, sess: &Session) {
+        if sess.target.arch != "riscv64" {
+            panic!("invalid arch {:?}", sess.target.arch);
+        }
+    }
 
     fn print(&self, req: &PrintRequest, out: &mut String, _sess: &Session) {
         writeln!(out, "havent done print() yet").unwrap();
